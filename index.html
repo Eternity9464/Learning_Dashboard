@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>网络工程技术学习</title>
+<style>
+*{box-sizing:border-box} body{margin:0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#0d1117;color:#e6edf3;line-height:1.65}
+.wrap{max-width:960px;margin:0 auto;padding:24px 16px 64px}
+header h1{font-size:28px;margin:8px 0 4px} header p{color:#8b949e;margin:4px 0}
+.stats{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0}
+.stat{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:10px 16px} .stat b{font-size:20px;color:#58a6ff}
+h2{margin-top:40px;border-bottom:1px solid #30363d;padding-bottom:8px;font-size:22px}
+.path{display:flex;gap:8px;flex-wrap:wrap} .step{flex:1;min-width:180px;background:#161b22;border:1px solid #30363d;border-radius:10px;padding:12px} .step b{color:#58a6ff}
+.filters{margin:16px 0;display:flex;gap:8px;flex-wrap:wrap}
+.filters button{background:#21262d;color:#e6edf3;border:1px solid #30363d;border-radius:20px;padding:6px 14px;cursor:pointer;font-size:14px}
+.filters button.on{background:#1f6feb;border-color:#1f6feb;color:#fff}
+.card{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:16px 18px;margin:12px 0}
+.card h3{margin:0 0 6px;font-size:17px} .card h3 a{color:#e6edf3;text-decoration:none} .card h3 a:hover{color:#58a6ff}
+.meta{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0} .tag{background:#21262d;border:1px solid #30363d;color:#8b949e;border-radius:12px;padding:1px 9px;font-size:12px}
+.hl{color:#d29922;font-weight:600;margin:6px 0}
+.card h4{margin:12px 0 4px;color:#58a6ff;font-size:14px} .card p{margin:4px 0}
+pre{background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:12px;overflow-x:auto;font-size:13px;white-space:pre-wrap}
+details summary{cursor:pointer;color:#58a6ff;margin-top:8px}
+.src{color:#8b949e;font-size:13px} .src a{color:#58a6ff}
+footer{margin-top:48px;color:#8b949e;font-size:13px;text-align:center}
+</style>
+</head>
+<body><div class="wrap">
+<header>
+<h1>网络工程技术学习</h1>
+<p>偏技术的学习库：每篇按「解决什么问题 → 核心技术 → 怎么做配置 → 运维排障」拆解。内容同步自 Muse 网络学习面板，更新于 2026-11-21。</p>
+<div class="stats">
+<div class="stat"><b>12</b> 篇技术拆解</div>
+<div class="stat"><b>8</b> 篇数通路由交换</div>
+<div class="stat"><b>4</b> 篇 AI 智算网络</div>
+<div class="stat"><b>12</b> 个开源项目</div>
+</div>
+</header>
+
+<h2>学习路径</h2>
+<div class="path">
+<div class="step"><b>第 1 步</b><br>路由交换基础：BGP / OSPF / MPLS VPN</div>
+<div class="step"><b>第 2 步</b><br>VXLAN / EVPN 数据中心 Fabric</div>
+<div class="step"><b>第 3 步</b><br>RoCE 智算网络与无损以太网</div>
+<div class="step"><b>第 4 步</b><br>SD-WAN 与网络自动化</div>
+</div>
+
+<h2>技术文章</h2>
+<div class="filters">
+<button class="on" data-f="all">全部</button>
+<button data-f="数通路由交换">数通路由交换</button>
+<button data-f="AI智算网络">AI智算网络</button>
+<button data-f="配置实战">配置实战</button>
+<button data-f="故障排查">故障排查</button>
+</div>
+<div id="articles">
+<article class="card" data-cat="AI智算网络" data-type="配置实战">
+<h3>思科Nexus：为RDMA配置验证无损以太网</h3>
+<div class="meta"><span class="tag">AI智算网络</span><span class="tag">配置实战</span><span class="tag">高级</span><span class="tag">思科</span></div>
+<p class="hl">Nexus实测验证RDMA无损以太网</p>
+<details><summary>展开拆解：问题 → 原理 → 配置 → 运维</summary>
+<h4>解决什么问题</h4><p>RDMA业务对丢包高度敏感，交换机与服务器无损配置不一致或未验证时易出现性能下降与重传。</p>
+<h4>核心技术</h4><p>在Nexus与服务器两侧对齐无损队列、PFC优先级与拥塞标记配置，并用交换机和服务器的真实统计验证丢包、暂停与队列状态。</p>
+<h4>怎么做配置</h4><pre>configure terminal
+配置无损队列的class-map/policy-map与PFC优先级
+接口启用PFC与ECN相关QoS策略
+服务器侧启用RDMA网卡的PFC/ECN并对齐优先级
+show interface priority-flow-control 查看PFC统计
+show队列与ECN标记计数验证无损</pre>
+<h4>运维 / 排障要点</h4><p>用show interface priority-flow-control等看PFC统计并对比服务器侧计数；常见坑是两侧优先级映射不一致导致无损队列未命中。</p>
+<p class="src">原文：<a href="https://www.networktcpip.com/post/configuring-and-verifying-lossless-ethernet-for-rdma" target="_blank" rel="noopener">www.networktcpip.com</a></p>
+</details></article>
+<article class="card" data-cat="AI智算网络" data-type="配置实战">
+<h3>华为RoCE连接：以太网交换机无损配置</h3>
+<div class="meta"><span class="tag">AI智算网络</span><span class="tag">配置实战</span><span class="tag">进阶</span><span class="tag">华为</span></div>
+<p class="hl">双交换机承载RoCE复制链路保无损</p>
+<details><summary>展开拆解：问题 → 原理 → 配置 → 运维</summary>
+<h4>解决什么问题</h4><p>存储复制走RoCE时网络丢包容忍度极低，普通以太网转发无法保证复制链路的无损与可靠性。</p>
+<h4>核心技术</h4><p>复制链路双归属接入两台交换机做冗余，交换机需支持无损传输，通过PFC、ECN等无损机制满足RoCE复制的高可靠低丢包要求。</p>
+<h4>怎么做配置</h4><pre>将复制链路分别接入两台以太网交换机
+为RoCE优先级队列启用PFC无损流控
+配置ECN与无损队列保证低丢包转发
+核对交换机支持无损能力与链路双归属
+用display命令查看接口状态与丢包计数</pre>
+<h4>运维 / 排障要点</h4><p>用display看接口丢弃、PFC暂停与队列计数，复制链路单交换机故障演练必做；常见坑是双链路实际落在同一台设备失去冗余。</p>
+<p class="src">原文：<a href="https://info.support.huawei.com/hedex/api/pages/EDOC1100214752/YEM0206J/13/resources/aa_san_200.html" target="_blank" rel="noopener">info.support.huawei.com</a></p>
+</details></article>
+<article class="card" data-cat="AI智算网络" data-type="架构设计">
+<h3>RoCE AI Fabric：自适应路由与多轨架构</h3>
+<div class="meta"><span class="tag">AI智算网络</span><span class="tag">架构设计</span><span class="tag">高级</span><span class="tag">其他</span></div>
+<p class="hl">自适应路由加多轨架构突破ECMP瓶颈</p>
+<details><summary>展开拆解：问题 → 原理 → 配置 → 运维</summary>
+<h4>解决什么问题</h4><p>大模型训练中传统ECMP按流哈希易冲突、链路流量不均，导致链路利用率低且线性加速比难以提升。</p>
+<h4>核心技术</h4><p>自适应路由AR按链路拥塞逐包动态选路替代ECMP按流哈希，结合Rail-Optimized多轨架构对齐GPU通信，提升利用率与加速比。</p>
+<h4>怎么做配置</h4><pre>规划Rail-Optimized多轨拓扑与GPU网卡对齐
+Underlay启用自适应路由AR逐包选路
+配置DCQCN/ECN/PFC实现无损与拥塞控制
+多平面隔离并验证链路负载均衡
+用集合通信压测验证加速比与链路利用率</pre>
+<h4>运维 / 排障要点</h4><p>重点看各成员链路利用率是否均衡与集合通信时延；逐包选路场景还需关注乱序对上层通信库的影响。</p>
+<p class="src">原文：<a href="https://ai-hpc.org/zh/guide/03-cluster/roce-ai-fabric" target="_blank" rel="noopener">ai-hpc.org</a></p>
+</details></article>
+<article class="card" data-cat="AI智算网络" data-type="运维经验">
+<h3>AI集群RoCEv2：ECN与PFC阈值平衡</h3>
+<div class="meta"><span class="tag">AI智算网络</span><span class="tag">运维经验</span><span class="tag">高级</span><span class="tag">其他</span></div>
+<p class="hl">ECN与PFC阈值平衡决定AI集群拥塞</p>
+<details><summary>展开拆解：问题 → 原理 → 配置 → 运维</summary>
+<h4>解决什么问题</h4><p>大规模AI训练集群拥塞时GPU利用率下降、作业完成时间拉长，RoCEv2拥塞控制调不好会加剧问题。</p>
+<h4>核心技术</h4><p>ECN在拥塞早期标记并让端侧降速，PFC按优先级暂停发送保无损；合理拉开两者阈值，让ECN先调节、PFC只兜底，避免暂停扩散。</p>
+<h4>怎么做配置</h4><pre>在RoCE队列上启用ECN标记并配置门限区间
+为无损优先级启用PFC并配置触发门限
+保证ECN先于PFC触发、PFC仅作最后防线
+在网卡与交换机两侧保持队列与优先级一致
+压测中逐步调整门限并观察GPU利用率</pre>
+<h4>运维 / 排障要点</h4><p>监控ECN标记计数与PFC暂停帧：暂停帧频繁说明阈值过低或拥塞已严重，几乎无ECN标记则可能门限过高未提前调节。</p>
+<p class="src">原文：<a href="http://techcommunity.microsoft.com/blog/azure-ai-foundry-blog/striking-the-right-balance-ecn-and-pfc-thresholds-for-ai-clusters/4468629" target="_blank" rel="noopener">techcommunity.microsoft.com</a></p>
+</details></article>
+<article class="card" data-cat="数通路由交换" data-type="架构设计">
+<h3>数据中心网络：Spine-Leaf、VXLAN/EVPN与多厂商命令</h3>
+<div class="meta"><span class="tag">数通路由交换</span><span class="tag">架构设计</span><span class="tag">进阶</span><span class="tag">思科、锐捷、华为、新华三</span></div>
+<p class="hl">四厂商命令对照看懂数据中心网络</p>
+<details><summary>展开拆解：问题 → 原理 → 配置 → 运维</summary>
+<h4>解决什么问题</h4><p>数据中心承载高并发业务时，要求高可用、低延迟、多租户隔离，传统架构与单厂商命令经验难以满足。</p>
+<h4>核心技术</h4><p>以Spine-Leaf无阻塞为骨架，叠加VXLAN Overlay做虚拟化、EVPN做控制面，再结合链路聚合与微分段实现弹性扩展与租户隔离。</p>
+<h4>怎么做配置</h4><pre>按Spine-Leaf规划Underlay路由与互联
+配置VXLAN VTEP、VNI与租户隔离
+配置EVPN BGP邻居通告主机路由
+配置链路聚合提升接入冗余与带宽
+按厂商手册核对思科/锐捷/华为/华三命令差异</pre>
+<h4>运维 / 排障要点</h4><p>多厂商命令同名不同义，上线前在实验环境核对语义与默认行为；排障统一看架构分层而非只套某一厂商命令。</p>
+<p class="src">原文：<a href="https://www.wsisp.com/helps/65179.html" target="_blank" rel="noopener">www.wsisp.com</a></p>
+</details></article>
+<article class="card" data-cat="数通路由交换" data-type="原理讲解">
+<h3>Spine-Leaf VXLAN Fabric：EVPN-VXLAN三层解析</h3>
+<div class="meta"><span class="tag">数通路由交换</span><span class="tag">原理讲解</span><span class="tag">高级</span><span class="tag">其他</span></div>
+<p class="hl">三层拆解EVPN-VXLAN Fabric</p>
+<details><summary>展开拆解：问题 → 原理 → 配置 → 运维</summary>
+<h4>解决什么问题</h4><p>只把VXLAN理解为VLAN数量扩展，排障时无法区分Underlay、Overlay与控制面故障层级。</p>
+<h4>核心技术</h4><p>将Fabric拆为三层：底层三层Underlay用尽所有链路转发，中层VXLAN封装租户流量，上层EVPN控制面通告可达性，分层定位故障。</p>
+<h4>怎么做配置</h4><pre>Underlay：逐链路启用路由协议并验证等价多路径
+Overlay：配置VTEP、VNI与VXLAN封装
+控制面：建立EVPN BGP邻居并开启MAC/IP通告
+验证：分层检查路由、隧道与转发表</pre>
+<h4>运维 / 排障要点</h4><p>按Underlay可达、EVPN通告、VXLAN转发表逐层查，不要直接改Overlay；某一层异常时先修复该层再复测上层。</p>
+<p class="src">原文：<a href="https://choiceguidelab.com/evpn-vxlan-part-1-vxlan-fabric/" target="_blank" rel="noopener">choiceguidelab.com</a></p>
+</details></article>
+<article class="card" data-cat="数通路由交换" data-type="架构设计">
+<h3>Spine-Leaf与VXLAN EVPN数据中心Fabric指南</h3>
+<div class="meta"><span class="tag">数通路由交换</span><span class="tag">架构设计</span><span class="tag">进阶</span><span class="tag">其他</span></div>
+<p class="hl">Spine-Leaf+EVPN告别STP阻塞链路</p>
+<details><summary>展开拆解：问题 → 原理 → 配置 → 运维</summary>
+<h4>解决什么问题</h4><p>传统数据中心二层靠STP防环会阻塞链路，已付带宽无法使用且扩展与多归属能力受限。</p>
+<h4>核心技术</h4><p>用Spine-Leaf全互联提供多条等价路径，Underlay跑三层路由，Overlay用VXLAN EVPN通告主机信息，替代STP阻塞实现全带宽转发。</p>
+<h4>怎么做配置</h4><pre>规划Spine-Leaf全互联与点到点互联链路
+Underlay部署OSPF/EBGP并保证VTEP环回可达
+Leaf上部署VXLAN VTEP与VNI映射
+BGP EVPN地址族通告MAC/IP路由
+接入侧用MLAG/LACP做双归属冗余</pre>
+<h4>运维 / 排障要点</h4><p>先保证Underlay的VTEP可达再查EVPN邻居与MAC/IP通告；STP残留阻塞或等价路径缺失会表现为Overlay不通。</p>
+<p class="src">原文：<a href="https://www.pinglabz.com/data-center-fabric/" target="_blank" rel="noopener">www.pinglabz.com</a></p>
+</details></article>
+<article class="card" data-cat="数通路由交换" data-type="配置实战">
+<h3>新华三EVPN配置限制与VXLAN隧道创建</h3>
+<div class="meta"><span class="tag">数通路由交换</span><span class="tag">配置实战</span><span class="tag">进阶</span><span class="tag">新华三</span></div>
+<p class="hl">EVPN启用前先切标准模式并重启</p>
+<details><summary>展开拆解：问题 → 原理 → 配置 → 运维</summary>
+<h4>解决什么问题</h4><p>EVPN部署时若设备工作模式不符或隧道关联方式冲突，功能无法生效且配置后仍不通。</p>
+<h4>核心技术</h4><p>先用system-working-mode standard切至标准模式、保存并重启使EVPN生效，再按EVPN自动或手工方式创建隧道且避免同VXLAN冲突关联。</p>
+<h4>怎么做配置</h4><pre>system-view
+system-working-mode standard
+保存当前配置文件
+重启设备使工作模式生效
+l2vpn enable并配置EVPN与VXLAN隧道
+注意自动与手工隧道不能同关联同一VXLAN</pre>
+<h4>运维 / 排障要点</h4><p>切换工作模式前务必保存配置并安排重启窗口；重启后先确认模式已生效再下发EVPN，避免配置看似成功却不生效。</p>
+<p class="src">原文：<a href="https://www.h3c.com/cn/d_202307/1899893_30005_0.htm" target="_blank" rel="noopener">www.h3c.com</a></p>
+</details></article>
+<article class="card" data-cat="数通路由交换" data-type="配置实战">
+<h3>新华三EVPN VXLAN与数据中心互联DCI配置</h3>
+<div class="meta"><span class="tag">数通路由交换</span><span class="tag">配置实战</span><span class="tag">高级</span><span class="tag">新华三</span></div>
+<p class="hl">EVPN自动建VXLAN隧道实现DCI互联</p>
+<details><summary>展开拆解：问题 → 原理 → 配置 → 运维</summary>
+<h4>解决什么问题</h4><p>多数据中心二层互联时，VXLAN隧道创建方式冲突或IPv6隧道限制易导致互联不通、业务无法扩展。</p>
+<h4>核心技术</h4><p>VXLAN隧道可由EVPN自动创建也可手工创建，但隧道目的相同者不能关联同一VXLAN；IPv6场景须满足公网侧与IRF端口板卡及承载限制。</p>
+<h4>怎么做配置</h4><pre>system-view
+l2vpn enable
+创建VSI并关联VXLAN ID
+配置EVPN实例、RD与VPN-Target
+选择EVPN自动创建或手工创建VXLAN隧道
+跨数据中心时按DCI场景关联隧道与VXLAN</pre>
+<h4>运维 / 排障要点</h4><p>用display查VXLAN隧道与VSI状态；常见坑是自动与手工隧道混关联同一VXLAN，以及IPv6隧道忽略SH系列接口板等限制。</p>
+<p class="src">原文：<a href="http://wwwsg.h3c.com/cn/d_202406/2203316_30005_0.htm" target="_blank" rel="noopener">wwwsg.h3c.com</a></p>
+</details></article>
+<article class="card" data-cat="数通路由交换" data-type="故障排查">
+<h3>华为云Direct Connect专线路由故障排查</h3>
+<div class="meta"><span class="tag">数通路由交换</span><span class="tag">故障排查</span><span class="tag">进阶</span><span class="tag">华为</span></div>
+<p class="hl">专线访问VPC不通先查路由与BGP</p>
+<details><summary>展开拆解：问题 → 原理 → 配置 → 运维</summary>
+<h4>解决什么问题</h4><p>企业经专线访问华为云VPC不通时，难以判断是静态路由未下发、BGP邻居异常还是ER转发环节出错。</p>
+<h4>核心技术</h4><p>分场景排查：先确认虚拟接口静态路由已下发或BGP对等已建立，再逐段核对VPC路由表与经企业路由器ER的路由传播。</p>
+<h4>怎么做配置</h4><pre>登录华为云专线控制台查看虚拟接口状态
+核对VPC路由表中专线静态路由是否已下发
+核对BGP对等体状态与通告路由
+经企业路由器ER时核对ER路由表与传播
+逐段复测云下到VPC的连通性</pre>
+<h4>运维 / 排障要点</h4><p>不要只看邻居Up，要核对实际收到的前缀与VPC/ER路由表是否一致；静态与BGP混用时注意路由优先级与漏下发。</p>
+<p class="src">原文：<a href="https://support.huaweicloud.com/eu/trouble-dc/dc_en_topic_0052025315.html" target="_blank" rel="noopener">support.huaweicloud.com</a></p>
+</details></article>
+<article class="card" data-cat="数通路由交换" data-type="故障排查">
+<h3>新华三典型故障：VLAN终结资源不足处理</h3>
+<div class="meta"><span class="tag">数通路由交换</span><span class="tag">故障排查</span><span class="tag">进阶</span><span class="tag">新华三</span></div>
+<p class="hl">VLAN终结资源不足的典型排障思路</p>
+<details><summary>展开拆解：问题 → 原理 → 配置 → 运维</summary>
+<h4>解决什么问题</h4><p>配置VLAN终结时提示资源不足，导致终结子接口无法下发、相关业务无法按规划开通。</p>
+<h4>核心技术</h4><p>按案例处理过程从报错现象回溯VLAN终结的资源占用与规格约束，清理或调整终结配置释放资源，再复测下发结果。</p>
+<h4>怎么做配置</h4><pre>记录报错时刻的VLAN终结配置与操作步骤
+display vlan 查看已有VLAN与终结子接口
+display interface 查看相关接口状态与计数
+核对资源占用与产品规格限制
+清理冗余终结配置或改用其他终结方式后复测</pre>
+<h4>运维 / 排障要点</h4><p>排障先保存报错原文与资源占用快照再做清理，避免误删在用终结配置；复测时同步看接口状态与业务流量是否恢复。</p>
+<p class="src">原文：<a href="https://dlaz.h3c.com/websitedownload/cn/202312/19/20231219_10096854_03-%E5%85%B8%E5%9E%8B%E6%95%85%E9%9A%9C%E6%A1%88%E4%BE%8B_1983991_30005_0.pdf?verify=1775595632-XbNcFgMdgjNhE6717FB649I9PjK27YAfyJy7AnsnC%2b8%3d" target="_blank" rel="noopener">dlaz.h3c.com</a></p>
+</details></article>
+<article class="card" data-cat="数通路由交换" data-type="配置实战">
+<h3>华为MPLS VPN：PE-CE间EBGP路由交换配置</h3>
+<div class="meta"><span class="tag">数通路由交换</span><span class="tag">配置实战</span><span class="tag">进阶</span><span class="tag">华为</span></div>
+<p class="hl">PE-CE用EBGP实现VPN站点路由交换</p>
+<details><summary>展开拆解：问题 → 原理 → 配置 → 运维</summary>
+<h4>解决什么问题</h4><p>MPLS VPN客户站点接入时，PE与CE之间路由不交换会导致站点前缀无法进入骨干、跨站点互访中断。</p>
+<h4>核心技术</h4><p>PE与CE建立EBGP邻居，PE在VPN实例地址族下与CE交换站点路由，再由骨干侧分发VPN路由，实现站点路由隔离接入与互通。</p>
+<h4>怎么做配置</h4><pre>system-view
+bgp &lt;as-number&gt;
+router-id &lt;ipv4-address&gt;（可选）
+ipv4-family vpn-instance &lt;vpn-instance-name&gt;
+peer &lt;CE地址&gt; as-number &lt;CE-AS&gt;</pre>
+<h4>运维 / 排障要点</h4><p>用display bgp peer查邻居是否Established、用VPNv4路由表查收发前缀；常见坑是AS号写反、未进VPN实例地址族或CE路由未引入。</p>
+<p class="src">原文：<a href="https://info.support.huawei.com/hedex/api/pages/EDOC1100149308/AEJ0713J/18/resources/admin/sec_admin_mplsvpn_0016.html" target="_blank" rel="noopener">info.support.huawei.com</a></p>
+</details></article>
+</div>
+
+<h2>行业开源项目</h2>
+<div id="projects">
+<article class="card">
+<h3><a href="https://frrouting.org/" target="_blank" rel="noopener">FRRouting (FRR)</a></h3>
+<div class="meta"><span class="tag">路由与协议</span><span class="tag">BGP</span><span class="tag">OSPF</span><span class="tag">EVPN</span></div>
+<p class="hl">开源路由协议套件</p>
+<p>支持 BGP、OSPF、IS-IS、LDP、BFD、PIM、EIGRP 等协议的开源路由软件，可运行在 Linux、容器和虚拟机上。</p>
+<h4>可以拿来练什么</h4><p>在实验室练 BGP / OSPF / EVPN 邻居与选路，或做路由反射器、边缘路由的开源方案验证。</p>
+</article>
+<article class="card">
+<h3><a href="https://github.com/osrg/gobgp" target="_blank" rel="noopener">GoBGP</a></h3>
+<div class="meta"><span class="tag">路由与协议</span><span class="tag">BGP</span><span class="tag">Go</span><span class="tag">SDN</span></div>
+<p class="hl">Go 语言实现的 BGP</p>
+<p>从零为现代环境设计的 BGP 实现，用 Go 语言编写，适合用程序控制路由的宣告与撤销。</p>
+<h4>可以拿来练什么</h4><p>用代码做 BGP 宣告、监控和自动化实验，理解 BGP 协议栈如何被软件实现。</p>
+</article>
+<article class="card">
+<h3><a href="https://github.com/nttgin/BGPalerter" target="_blank" rel="noopener">BGPalerter</a></h3>
+<div class="meta"><span class="tag">监控与可观测</span><span class="tag">BGP</span><span class="tag">监控</span><span class="tag">告警</span></div>
+<p class="hl">BGP 实时监控告警</p>
+<p>自配置的 BGP 监控工具，连接公开路由数据源实时监控，可通过文件、邮件、Kafka、Slack 等方式告警。</p>
+<h4>可以拿来练什么</h4><p>盯住自己网络的路由是否被劫持或泄露，BGP 异常时第一时间收到提醒。</p>
+</article>
+<article class="card">
+<h3><a href="https://netboxlabs.com/open-source-netbox/" target="_blank" rel="noopener">NetBox</a></h3>
+<div class="meta"><span class="tag">资产与IPAM</span><span class="tag">IPAM</span><span class="tag">DCIM</span><span class="tag">自动化</span></div>
+<p class="hl">网络的唯一真相源</p>
+<p>记录网络一切资产的真相源：从机柜、供电、布线等物理组件，到 IP 地址、VLAN 等虚拟资产，自动化工具都依赖它的数据下发配置。</p>
+<h4>可以拿来练什么</h4><p>把机架、设备、IP、VLAN、电路统一记在 NetBox 里，让自动化从这里读清单，告别用 Excel 管 IP。</p>
+</article>
+<article class="card">
+<h3><a href="https://www.batfish.org/" target="_blank" rel="noopener">Batfish</a></h3>
+<div class="meta"><span class="tag">配置备份与校验</span><span class="tag">配置分析</span><span class="tag">变更校验</span><span class="tag">可达性</span></div>
+<p class="hl">配置先离线校验，再上线</p>
+<p>网络配置分析工具：离线找出配置错误并验证计划或现行配置的正确性，让网络变更更安全、不用怕上线即中断或出安全漏洞。</p>
+<h4>可以拿来练什么</h4><p>变更前把候选配置丢给 Batfish 离线仿真，提前发现 ACL、路由、可达性问题。</p>
+</article>
+<article class="card">
+<h3><a href="https://github.com/ytti/oxidized" target="_blank" rel="noopener">Oxidized</a></h3>
+<div class="meta"><span class="tag">配置备份与校验</span><span class="tag">配置备份</span><span class="tag">Git</span><span class="tag">合规</span></div>
+<p class="hl">配置自动备份，替代 RANCID</p>
+<p>网络设备配置备份工具，轻量、可扩展，支持 130 多种设备操作系统类型。</p>
+<h4>可以拿来练什么</h4><p>定时拉取全网设备配置存进 Git，每次变更都有 diff，出问题能快速回看与恢复。</p>
+</article>
+<article class="card">
+<h3><a href="https://containerlab.dev/" target="_blank" rel="noopener">Containerlab</a></h3>
+<div class="meta"><span class="tag">实验室与仿真</span><span class="tag">实验</span><span class="tag">EVPN</span><span class="tag">VXLAN</span></div>
+<p class="hl">容器化网络实验室</p>
+<p>用 CLI 编排容器化网络实验室：启动容器、搭建虚拟连线生成实验拓扑，并管理实验室的整个生命周期。</p>
+<h4>可以拿来练什么</h4><p>一条命令拉起 Spine-Leaf / EVPN 拓扑练 VXLAN，没有真机也能复现数据中心组网。</p>
+</article>
+<article class="card">
+<h3><a href="https://www.gns3.com/" target="_blank" rel="noopener">GNS3</a></h3>
+<div class="meta"><span class="tag">实验室与仿真</span><span class="tag">仿真</span><span class="tag">实验</span><span class="tag">学习</span></div>
+<p class="hl">图形化网络仿真</p>
+<p>在无风险的虚拟环境里设计、搭建和测试网络，适合从备考学习到搭建大型网络方案验证。</p>
+<h4>可以拿来练什么</h4><p>拖拽搭拓扑做方案验证和练手，刚开始练路由交换时低成本试错。</p>
+</article>
+<article class="card">
+<h3><a href="https://github.com/ktbyers/netmiko" target="_blank" rel="noopener">Netmiko</a></h3>
+<div class="meta"><span class="tag">网络自动化</span><span class="tag">Python</span><span class="tag">SSH</span><span class="tag">多厂商</span></div>
+<p class="hl">Python 操作多厂商设备 CLI</p>
+<p>面向网络设备的自动化库：采集 show 命令输出、在广泛的设备平台上做配置变更，并屏蔽底层连接状态的繁琐处理。</p>
+<h4>可以拿来练什么</h4><p>写 Python 脚本批量采集和下发配置，是多厂商巡检采集的常用入门工具。</p>
+</article>
+<article class="card">
+<h3><a href="https://github.com/nornir-automation/nornir" target="_blank" rel="noopener">Nornir</a></h3>
+<div class="meta"><span class="tag">网络自动化</span><span class="tag">Python</span><span class="tag">自动化框架</span></div>
+<p class="hl">纯 Python 自动化框架</p>
+<p>纯 Python 的自动化框架，直接用 Python 控制一切，而不是再学一套自己的 DSL 语言。</p>
+<h4>可以拿来练什么</h4><p>在 Netmiko 之上做并发、编排和插件化，把日常巡检 / 变更脚本工程化。</p>
+</article>
+<article class="card">
+<h3><a href="https://www.librenms.org/" target="_blank" rel="noopener">LibreNMS</a></h3>
+<div class="meta"><span class="tag">监控与可观测</span><span class="tag">SNMP</span><span class="tag">监控</span><span class="tag">告警</span></div>
+<p class="hl">全功能网络监控系统</p>
+<p>功能完整的网络监控系统，提供丰富的监控特性和广泛的设备支持，源自 Observium 项目。</p>
+<h4>可以拿来练什么</h4><p>用 SNMP 监控交换机、路由器、防火墙的端口流量与告警，替代手工逐台巡检看状态。</p>
+</article>
+<article class="card">
+<h3><a href="https://github.com/netenglabs/suzieq" target="_blank" rel="noopener">SuzieQ</a></h3>
+<div class="meta"><span class="tag">监控与可观测</span><span class="tag">可观测</span><span class="tag">多厂商</span><span class="tag">排障</span></div>
+<p class="hl">多厂商网络可观测平台</p>
+<p>首个开源、多厂商的网络可观测平台，既是框架也是应用，目标是帮你真正看懂自己的网络状态。</p>
+<h4>可以拿来练什么</h4><p>把 BGP、OSPF、LLDP、接口状态统一采下来用查询排障，快速定位哪台设备邻居掉了。</p>
+</article>
+</div>
+
+<footer>网络工程技术学习 · 由 Muse 维护同步 · 拆解内容均基于原文核对，不编造</footer>
+</div>
+<script>
+document.querySelectorAll('.filters button').forEach(function(b){
+  b.addEventListener('click', function(){
+    document.querySelectorAll('.filters button').forEach(function(x){x.classList.remove('on')});
+    b.classList.add('on');
+    var f = b.getAttribute('data-f');
+    document.querySelectorAll('#articles .card').forEach(function(c){
+      var show = (f==='all') || c.getAttribute('data-cat')===f || c.getAttribute('data-type')===f;
+      c.style.display = show ? '' : 'none';
+    });
+  });
+});
+</script>
+</body></html>
